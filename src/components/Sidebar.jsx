@@ -1,29 +1,32 @@
-import { Link } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // ✅ named import, not default
+import React from "react";
+import { Drawer, List, ListItem, ListItemText } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
-  const token = localStorage.getItem("token");
-  let role = "";
-
-  if (token) {
-    try {
-      role = jwtDecode(token).role;
-    } catch (error) {
-      console.error("Invalid token:", error);
-    }
-  }
+  const navigate = useNavigate();
 
   return (
-    <div className="sidebar">
-      <Link to="/dashboard">Dashboard</Link>
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: 220,
+        "& .MuiDrawer-paper": {
+          width: 220,
+          background: "#111827",
+          color: "#fff",
+        },
+      }}
+    >
+      <List>
+        <ListItem button onClick={() => navigate("/dashboard")}>
+          <ListItemText primary="Dashboard" />
+        </ListItem>
 
-      {role === "Admin" && <Link to="/employees">Employees</Link>}
-      {(role === "Admin" || role === "Manager") && (
-        <Link to="/projects">Projects</Link>
-      )}
-
-      <Link to="/tasks">Tasks</Link>
-    </div>
+        <ListItem button onClick={() => navigate("/tasks")}>
+          <ListItemText primary="Tasks" />
+        </ListItem>
+      </List>
+    </Drawer>
   );
 };
 
