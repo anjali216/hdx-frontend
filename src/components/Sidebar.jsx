@@ -19,7 +19,15 @@ const Sidebar = () => {
     >
       <List>
         <ListItem button onClick={() => navigate("/dashboard")}>
-          <ListItemText primary="Dashboard" />
+          <ListItemText primary="Dashboard"/>
+        </ListItem>
+
+        <ListItem button onClick={() => navigate("/employees")}>
+          <ListItemText primary="Employees" />
+        </ListItem>
+
+        <ListItem button onClick={() => navigate("/projects")}>
+          <ListItemText primary="Projects" />
         </ListItem>
 
         <ListItem button onClick={() => navigate("/tasks")}>
