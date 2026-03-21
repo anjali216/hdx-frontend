@@ -11,6 +11,7 @@ import {
   CardContent,
   IconButton,
   CircularProgress,
+  Chip,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -19,7 +20,7 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
-    name: "",
+    title: "", // ✅ FIXED (was name)
   });
 
   // ✅ Fetch Projects
@@ -40,7 +41,7 @@ export default function Projects() {
 
   // ✅ Add Project
   const addProject = async () => {
-    if (!form.name) {
+    if (!form.title) {
       alert("Enter project name");
       return;
     }
@@ -48,10 +49,9 @@ export default function Projects() {
     try {
       const res = await API.post("/projects", form);
 
-      // instant UI update
       setProjects((prev) => [...prev, res.data]);
 
-      setForm({ name: "" });
+      setForm({ title: "" });
     } catch (err) {
       console.error(err);
     }
@@ -81,9 +81,9 @@ export default function Projects() {
               <TextField
                 fullWidth
                 label="Project Name"
-                value={form.name}
+                value={form.title}
                 onChange={(e) =>
-                  setForm({ name: e.target.value })
+                  setForm({ title: e.target.value })
                 }
               />
             </Grid>
@@ -119,23 +119,34 @@ export default function Projects() {
                   "&:hover": { transform: "scale(1.03)" },
                 }}
               >
-                <CardContent
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography fontWeight="bold">
-                    {p.name}
+                <CardContent>
+                  <Typography variant="h6" fontWeight="bold">
+                    {p.title} {/* ✅ FIXED */}
                   </Typography>
 
-                  <IconButton
-                    color="error"
-                    onClick={() => deleteProject(p._id)}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
                   >
-                    <DeleteIcon />
-                  </IconButton>
+                    {p.description || "No description"}
+                  </Typography>
+
+                  <Chip
+                    label={p.status}
+                    color={p.status === "active" ? "success" : "default"}
+                    size="small"
+                    sx={{ mb: 1 }}
+                  />
+
+                  <Box display="flex" justifyContent="flex-end">
+                    <IconButton
+                      color="error"
+                      onClick={() => deleteProject(p._id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
