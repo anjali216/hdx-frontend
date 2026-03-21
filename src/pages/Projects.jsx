@@ -9,9 +9,13 @@ import {
   Grid,
   Card,
   CardContent,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
   IconButton,
   CircularProgress,
-  Chip,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -20,10 +24,11 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
-    title: "", // ✅ FIXED (was name)
+    title: "",
+    description: "",
   });
 
-  // ✅ Fetch Projects
+  // Fetch Projects
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -39,25 +44,20 @@ export default function Projects() {
     fetchProjects();
   }, []);
 
-  // ✅ Add Project
+  // Add Project
   const addProject = async () => {
-    if (!form.title) {
-      alert("Enter project name");
-      return;
-    }
+    if (!form.title) return alert("Enter project title");
 
     try {
       const res = await API.post("/projects", form);
-
       setProjects((prev) => [...prev, res.data]);
-
-      setForm({ title: "" });
+      setForm({ title: "", description: "" });
     } catch (err) {
       console.error(err);
     }
   };
 
-  // ✅ Delete Project
+  // Delete Project
   const deleteProject = async (id) => {
     try {
       await API.delete(`/projects/${id}`);
@@ -69,21 +69,35 @@ export default function Projects() {
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Header */}
       <Typography variant="h4" fontWeight="bold" mb={3}>
-        Projects
+        Project Management
       </Typography>
 
       {/* Add Project */}
-      <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 3 }}>
+      <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 2 }}>
         <CardContent>
+          <Typography mb={2}>Add New Project</Typography>
+
           <Grid container spacing={2}>
-            <Grid item xs={12} md={9}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Project Name"
+                label="Project Title"
                 value={form.title}
                 onChange={(e) =>
-                  setForm({ title: e.target.value })
+                  setForm({ ...form, title: e.target.value })
+                }
+              />
+            </Grid>
+
+            <Grid item xs={12} md={5}>
+              <TextField
+                fullWidth
+                label="Description"
+                value={form.description}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
                 }
               />
             </Grid>
@@ -95,7 +109,7 @@ export default function Projects() {
                 onClick={addProject}
                 sx={{ height: "56px" }}
               >
-                Add Project
+                ADD
               </Button>
             </Grid>
           </Grid>
@@ -103,62 +117,63 @@ export default function Projects() {
       </Card>
 
       {/* Project List */}
-      {loading ? (
-        <Box textAlign="center" mt={4}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <Grid container spacing={3}>
-          {projects.map((p) => (
-            <Grid item xs={12} sm={6} md={4} key={p._id}>
-              <Card
-                sx={{
-                  borderRadius: 3,
-                  boxShadow: 3,
-                  transition: "0.3s",
-                  "&:hover": { transform: "scale(1.03)" },
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold">
-                    {p.title} {/* ✅ FIXED */}
-                  </Typography>
+      <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
+        <CardContent>
+          <Typography mb={2}>Project List</Typography>
 
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 1 }}
-                  >
-                    {p.description || "No description"}
-                  </Typography>
+          {loading ? (
+            <Box textAlign="center">
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#1976d2" }}>
+                  <TableCell sx={{ color: "#fff" }}>Title</TableCell>
+                  <TableCell sx={{ color: "#fff" }}>
+                    Description
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff" }}>
+                    Status
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff" }}>
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-                  <Chip
-                    label={p.status}
-                    color={p.status === "active" ? "success" : "default"}
-                    size="small"
-                    sx={{ mb: 1 }}
-                  />
+              <TableBody>
+                {projects.map((p) => (
+                  <TableRow key={p._id}>
+                    <TableCell>{p.title}</TableCell>
+                    <TableCell>
+                      {p.description || "-"}
+                    </TableCell>
+                    <TableCell>{p.status}</TableCell>
 
-                  <Box display="flex" justifyContent="flex-end">
-                    <IconButton
-                      color="error"
-                      onClick={() => deleteProject(p._id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+                    <TableCell>
+                      <IconButton
+                        color="error"
+                        onClick={() => deleteProject(p._id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
 
-          {projects.length === 0 && (
-            <Typography sx={{ ml: 2 }}>
-              No Projects Found
-            </Typography>
+                {projects.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      No Projects Found
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           )}
-        </Grid>
-      )}
+        </CardContent>
+      </Card>
     </Box>
   );
 }
