@@ -62,10 +62,7 @@ const Login = () => {
             }
           />
 
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
+          <TextField fullWidth label="Password" type="password"
             margin="normal"
             variant="outlined"
             value={form.password}
